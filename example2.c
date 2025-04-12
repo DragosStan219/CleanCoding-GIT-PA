@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
 typedef struct Node
 {
     int data;
@@ -178,4 +177,5 @@ int main()
     printf("Parcurgere cu BFS: ");
     BFS(graph, starting_vertex);
 
-return 0;}
+    return 0;
+}
