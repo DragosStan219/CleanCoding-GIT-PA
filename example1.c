@@ -1,5 +1,4 @@
 /*Determinati daca exista sau nu drum direct intre doua restaurante dintr-o retea de tip graf*/
-
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -47,10 +46,10 @@ void add_edge(GPH *g, int src, int dest)
 
 GPH *create_g(int v)
 {
-    GPH *g = (GPH *)malloc(sizeof(GPH));
+    GPH *g = malloc(sizeof(GPH));
     g->v = v;
-    g->alst = (NODE **)malloc(sizeof(NODE *) * v);
-    g->vis = (int *)malloc(sizeof(int) * v);
+    g->alst = malloc(sizeof(NODE *) * v);
+    g->vis = malloc(sizeof(int) * v);
 
     for (int i = 0; i < v; i++)
     {
@@ -62,9 +61,7 @@ GPH *create_g(int v)
 
 STK *create_s(int scap)
 {
-
     STK *s = (STK *)malloc(sizeof(STK));
-
     s->arr = malloc(scap * sizeof(int));
     s->t = -1;
     s->scap = scap;
@@ -73,11 +70,8 @@ STK *create_s(int scap)
 
 void push(int pshd, STK *s)
 {
-    if (s->t + 1 < s->scap)
-    {
-        s->t = s->t + 1;
-        s->arr[s->t] = pshd;
-    }
+    (s->t) = (s->t) + 1;
+    s->arr[s->t] = pshd;
 }
 
 void DFS(GPH *g, STK *s, int v_nr)
@@ -90,7 +84,9 @@ void DFS(GPH *g, STK *s, int v_nr)
     {
         int con_ver = aux->data;
         if (g->vis[con_ver] == 0)
+        {
             DFS(g, s, con_ver);
+        }
         aux = aux->next;
     }
 }
@@ -98,7 +94,7 @@ void DFS(GPH *g, STK *s, int v_nr)
 void insert_edges(GPH *g, int edg_nr, int nrv)
 {
     int src, dest;
-    printf("adauga %d munchii (de la 0 la %d)\n", edg_nr, nrv - 1);
+    printf("adauga %d munchii (de la 0 la %d)\n", edg_nr, nrv);
     for (int i = 0; i < edg_nr; i++)
     {
         scanf("%d%d", &src, &dest);
@@ -114,37 +110,26 @@ void wipe(GPH *g, int nrv)
     }
 }
 
-void canbe(GPH *g, int nrv, STK *s1, STK *s2, int ans)
+void canbe(GPH *g, int nrv, STK *s1, STK *s2) // 0 sau 1 daca poate fi sau nu ajuns
 {
-    for (int i = 0; i < nrv; i++)
+    int i, j, ans;
+    int *canbe = calloc(5, sizeof(int));
+    for (i = 0; i < nrv; i++) // aici i tine loc de numar adica de restaurant{for (int j = 0; j < 5; j++)
     {
-        for (int j = 0; j < nrv; j++)
+        DFS(g, s1, i);
+        wipe(g, nrv);
+        DFS(g, s2, j);
+        for (j = 0; j < nrv && !ans; j++)
         {
-            s1->t = -1;
-            s2->t = -1;
-            wipe(g, nrv);
-            DFS(g, s1, i);
-            wipe(g, nrv);
-            DFS(g, s2, j);
-
-            for (int k = 0; k <= s1->t; k++)
+            for (i = 0; i < nrv && !ans; i++)
             {
-                for (int l = 0; l <= s2->t; l++)
+                if ((s1->arr[i] == j) && (s2->arr[j] == i))
                 {
-                    if (s1->arr[k] == j && s2->arr[l] == i)
-                    {
-                        printf("Drum direct sau indirect intre %d si %d: DA\n", i, j);
-                        ans = 1;
-                        goto end;
-                    }
+                    canbe = 1;
                 }
             }
         }
     }
-
-end:
-    if (!ans)
-        printf("Nu exista drum intre nodurile date\n");
 }
 
 int main()
@@ -152,6 +137,10 @@ int main()
     int nrv;
     int edg_nr;
     int ans = 0;
+    int src, dest;
+    int i;
+    int vortex_1;
+    int vortex_2;
 
     printf("cate noduri are girafa? ");
     scanf("%d", &nrv);
@@ -159,12 +148,14 @@ int main()
     printf("cate muchii are giraful? ");
     scanf("%d", &edg_nr);
 
-    GPH *g = create_g(nrv);
+    GPH *g = create_g(&nrv);
+
     STK *s1 = create_s(2 * nrv);
     STK *s2 = create_s(2 * nrv);
 
     insert_edges(g, edg_nr, nrv);
-    canbe(g, nrv, s1, s2, ans);
+
+    canbe(g, nrv, s1, s2);
 
     return 0;
 }
